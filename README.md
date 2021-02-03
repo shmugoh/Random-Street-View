@@ -94,4 +94,4 @@ I'm using it because it's the easiest way to reverse geocoordinates that are com
 If you see that the code's messy, something doesn't work, or I left something dumb there accidentally then feel free to send a pull request and I'll review it!
 
 ## License
-[MIT](https://choosealicense.com/licenses/mit/)
+[MIT](https://raw.githubusercontent.com/juanpisuribe13/Random-Street-View/master/LICENSE)
