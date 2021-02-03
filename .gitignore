@@ -1,5 +1,8 @@
+/__pycache__
+/win32_env
 .twurlrc
 config.cfg
 panorama.png
 sv.db
-/win32_env
+TM_WORLD_BORDERS-0.3.shp
+TM_WORLD_BORDERS-0.3.dbf

@@ -1,20 +1,13 @@
-import os, random, sys, svDB
-import shapefile, googlemaps, requests
+import os, random, sys, webbrowser
+import shapefile, googlemaps, requests, svDB
 import tweepy, configparser
 from time import sleep 
 from datetime import datetime
-import pprint
-
-import hashlib
-import hmac
-import base64
-import urllib.parse as urlparse
 
 ABB = ["AUS", "JPN", "KHM", "KOR", "MYS", "NZL", "PHL", "RUS", "SGP", "THA", "TUR", "TWN"]
 
 EEE = ["ALB", "AUT", "BEL", "BGR", "CHE", "CZE", "DNK", "ESP", "EST" "FIN", "FRA", "GBR", "GRC", "HRV", "HUN", 
 "IRL", "ISL", "ITA", "LTU", "LVA", "MNE", "NLD", "NOR", "POL", "PRT", "ROU", "SRB", "SVK", "SVN", "SWE", "UKR", "VAT"]
-
 FFF = ["ARE", "ISR", "LSO", "SWZ", "ZAF"]
 
 NNN = ["CAN", "MEX", "PRI", "USA"]
@@ -42,6 +35,7 @@ gmapsAPI_KEY = config['Google API Keys']['api_key']
 gmapsSIGNING_KEY = config['Google API Keys']['signing_key']
 gmaps = googlemaps.Client(gmapsAPI_KEY)
 
+## ------------- Misc ------------- ##
 CurrentTry = int(config['Tries']['CurrentTry'])
 MaximumTries = int(config['Tries']['MaximumTries'])
 
@@ -69,6 +63,9 @@ def getTime():
     now = datetime.now()
     return now.strftime("%d/%m/%y %H:%M:%S")
 
+## ------------- Misc ------------- ##
+## thought this was cool sorry
+
 def tweet(panorama, info):
     twtAPI.update_with_media(panorama, info)
 
@@ -93,19 +90,18 @@ def point_inside_polygon(x, y, poly):
                         inside = not inside
         p1x, p1y = p2x, p2y
     return inside
-# Determine if a point is inside a given polygon or not
+# Determines if a point is inside a given polygon or not
 # Polygon is a list of (x,y) pairs.
 # http://www.ariel.com.au/a/python-point-int-poly.html
 
 def hasStreetView(lat, lon):
     global gmapsAPI_KEY
     url = ("https://maps.googleapis.com/maps/api/streetview/metadata?location={},{}&radius=2000&key={}".format(lat, lon, gmapsAPI_KEY))
-
     metadata = requests.get(url).json()
     if metadata['status'] == "ZERO_RESULTS":
         return False, None
     elif metadata['status'] == "OK":
-        if 'Google' not in metadata['copyright']:
+        if 'Google' not in metadata['copyright']: # just to avoid using non-street view imagery
             return False, None
         else:
             coords = (metadata['location']['lat'], metadata['location']['lng'])
@@ -126,20 +122,18 @@ def getCoords(coords):
             return False
         except IndexError:
             return False
-        
     return coordsArr, reverse_geocodeJSON
     # To get the latitude and longitude, please use 0; otherwise, to get more details such as unused coordinates and addreses, use 1.
 
-print("Loading World Borders shape file...", end = '\r')
-shape_file = "TM_WORLD_BORDERS-0.3.shp"
-if not os.path.exists(shape_file):
+ShapeFile = "TM_WORLD_BORDERS-0.3.shp"
+if not os.path.exists(ShapeFile):
     print(
-        "Cannot find " + shape_file + ". Please download it from "
-        "http://thematicmapping.org/downloads/world_borders.php and try again."
-    )
+        "Cannot find TM_WORLD_BORDERS.shp/.dbf files. Please download it from "
+        "http://thematicmapping.org/downloads/world_borders.php and try again.")
+    webbrowser.open("http://thematicmapping.org/downloads/world_borders.php")
     sys.exit()
 
-sf = shapefile.Reader(shape_file, encoding="latin1")
+sf = shapefile.Reader(ShapeFile, encoding="latin1")
 shapes = sf.shapes()
 ## Loads the World Borders Shape Folder
 
@@ -164,39 +158,36 @@ if __name__=="__main__":
             ## Checks if coordinate is inside polygon
             if point_inside_polygon(rand_lon, rand_lat, borders):
                 coords = (rand_lat, rand_lon)
-                locations = gmaps.reverse_geocode((coords))
-                place = getCoords(coords)
+                coordsArr = getCoords(coords)
+                ## coordsArr[0] for available latitude and longitute coordinates; coordsArr[1] for the full JSON file
 
-                if place is False:
+                if coordsArr is False:
                     print(f"{c.fail}%s - Cannot reverse geocode; repeating...{c.olors}" % (getTime()))
                     continue
                 
-                for i in range(len(place[0])):
-                    if i > len(place[0]) or i == len(place[0]):
+                for i in range(len(coordsArr[0])):
+                    if i > len(coordsArr[0]) or i == len(coordsArr[0]):
                         hasPamID = False
                         break
+                    ## Checks if Coordinates Array has no coordinates
+                    ## i think? i was too tired while i was writing that
+                    ## always comment your block of code kids! the things you dont do are the things you need!
 
-                    pamID = hasStreetView(place[0][i][0], place[0][i][1])
+                    pamID = hasStreetView(coordsArr[0][i][0], coordsArr[0][i][1])
+                    # 0 = Boolean Expression; 1 = Panorama ID; 2 = Coordinates
                     hasPamID = pamID[0]
                     if hasPamID is True:
-                        print("%s - Found panoramic ID; tweeting..." % (getTime()))
-                        coords = place[0][i][0], place[0][i][1], i
-                        # Gets the coordinates of the panoramic ID (coords[0] and coords[1]) and the JSON variable (coords[2])
-                        JSON = place[1][i]
-                        address = JSON['formatted_address']
                         lat = pamID[2][0]
                         lon = pamID[2][1]
                         coords = lat, lon
+
+                        JSON = coordsArr[1][i]
+                        address = JSON['formatted_address']
                         break
+                        # Skips to line 202
                     else:
-                        print("Doesn't have panoramic ID, repeating...", end ='\r')
+                        print(f"{c.warning}%s - %s doesn't have panoramic ID, repeating...{c.olors}" % (getTime(), nation))
                         continue
-            
-                # try:
-                #     print("%s - Got address %s; getting panorama ID and coordinates..." % (getTime(), place))
-                # except IndexError:
-                #     print(f"{c.fail}%s - No address found; repeating{c.olors}" % (getTime()))
-                #     continue
 
                 if hasPamID is True:
                     if svDB.FindPamID(pamID[1]):
@@ -204,15 +195,13 @@ if __name__=="__main__":
                         continue
                         # sys.exit()
                     else:
-                        print(f"{c.okGreen}%s - Got panorama ID %s, address %s, and coordinates %s; downloading image...{c.olors}" % (getTime(), pamID[1], address, (lat, lon)))
+                        print(f"{c.okGreen}%s - Got panorama ID %s, address %s, and coordinates %s; tweeting...{c.olors}" % (getTime(), pamID[1], address, (lat, lon)))
                         SavePanorama("https://maps.googleapis.com/maps/api/streetview?size=600x640&pano={}&fov=75&key={}".format(pamID[1], gmapsAPI_KEY))
-                        print(f"{c.okGreen}%s - Got image; tweeting...{c.olors}" % (getTime()))
-                        x = random.randrange(3, 5) # defines last digits to round coordinates
-                        TweetContent = ("%s (%s, %s)" % (address, (round(lat, x)), (round(lon, x))))
+                        ld = random.randrange(3, 5) # defines last digits to round coordinates
+                        TweetContent = ("%s (%s, %s)" % (address, (round(lat, ld)), (round(lon, ld))))
                         # TweetContent = address, (round(lat, x)), (round(lon, x))
                         break
                 elif hasPamID is False:
-                    print("Generating new coordinate...")
                     print(f"{c.warning}%s - Coordinate doesn't have street view; repeating...{c.olors}" % (getTime()), end="\r")
                     continue
                 break
@@ -222,8 +211,10 @@ if __name__=="__main__":
         
         while True:
             try:
-                print("panorama.png", TweetContent)
-                # tweet("panorama.png", TweetContent)
+                ## twitter stuff down below
+                # print("panorama.png", TweetContent) 
+                tweet("panorama.png", TweetContent)
+                ## only comment tweet and uncomment print if troubleshooting
                 resetCount('Tries', 'CurrentTry')
                 break
             except tweepy.error.TweepError:
@@ -231,13 +222,13 @@ if __name__=="__main__":
                     print(f"{c.fail}%s - Cannot tweet anymore. Trying again in 15 minutes{c.olors}" % (getTime()))
                     sleep(60 * 15) 
                     break
+                    # just in case if the bot gets rate limited
                 else:
                     sumCount(CurrentTry, 'Tries', 'CurrentTry')
                     CurrentTry = int(config['Tries']['CurrentTry'])
                     print(f"{c.fail}%s - Could not tweet. Trying again...{c.olors}" % (getTime()))
                     print(f"{c.fail}%s{c.olors}" % (TweepError))
 
-        print(coords)
         svDB.createRow(pamID[1], address, str(coords))
         print("------------------------------------------------------------------------------",
         f"\n{c.okGreen} %s - Tweeted: Address = %s. Coordinates = %s. Panorama ID = %s{c.olors}" % (getTime(), address, coords, pamID[1]),
