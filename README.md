@@ -1,5 +1,7 @@
 # Random Street View (Bot) 
 
+Archvived repository because I am moving on from Twitter. Expect bugs. Feel free to host it (by crediting me of course).
+
 **Please be aware that this sends a lot of requests to Google's API thus it may be pricey. if you want an estimation on how much it'll cost monthly and has Google Cloud's $200 credit promotion, monitor the requests and the billing and make your own conclusions.** 
 
 **I am not responsible if Google charges you a million dollars, that's your problem for not monitoring billing or calculating.**
