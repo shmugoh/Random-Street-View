@@ -2,7 +2,7 @@ import requests
 import re
 import os
 import numpy as np
-import tiles
+import streetview.tiles as tiles
 
 def _panoid_url(lat, lon):
     """
@@ -61,6 +61,7 @@ def download_panorama(panoID, zoom=4, keep_tiles=False):
         pass
 
 if __name__ == "__main__":
+    import tiles
     lat = 6.237965431428744
     lon = -75.6095178872445
     pan = getpanoID(lat, lon)

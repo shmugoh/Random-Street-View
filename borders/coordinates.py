@@ -25,10 +25,12 @@ def _point_inside_polygon(x, y, poly):
 
 def generate_random_coordinates():
     """
+    Returns a random generated coordinate and its country.
+    
     Picks a random continent and country, then generates
     a random coordinate inside the country.
     """
-    ShapeFile = "TM_WORLD_BORDERS-0.3.shp"
+    ShapeFile = "borders/TM_WORLD_BORDERS-0.3.shp"
     sf = shapefile.Reader(ShapeFile, encoding="latin1")
     shapes = sf.shapes()
     while True:
@@ -42,8 +44,12 @@ def generate_random_coordinates():
                 max_lon, max_lat = shapes[i].bbox[2], shapes[i].bbox[3]
                 borders = shapes[i].points
                 break
-        rand_lat = random.uniform(min_lat, max_lat)
-        rand_lon = random.uniform(min_lon, max_lon) 
+        try:
+            rand_lat = random.uniform(min_lat, max_lat)
+            rand_lon = random.uniform(min_lon, max_lon) 
+        except UnboundLocalError:
+            print("what")
+            continue
 
         # Checks if coordinate 
         # is inside polygon
@@ -53,4 +59,4 @@ def generate_random_coordinates():
             continue
 
 if __name__ == "__main__":
-    generate_random_coordinates()
+    print(generate_random_coordinates())

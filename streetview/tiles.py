@@ -1,5 +1,5 @@
 import requests
-import panorama
+import streetview.panorama as panorama
 import os
 
 from PIL import Image
@@ -56,6 +56,7 @@ def download_tile(panoID, x, y, i, zoom):
     im.save(f"tile{i}.png")
 
 if __name__ == "__main__":
+    import panorama
     panorama.download_panorama("R5CMjP6w-l8q6aqt4wSyTA")
     
     # https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid=-xXXTLmT8HnuH2BpwkY3wQ&x=12&y=6&zoom=4&nbt=1&fover=2
