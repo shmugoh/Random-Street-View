@@ -1,10 +1,13 @@
 import requests
 import panorama
+import os
 
 from PIL import Image
 from io import BytesIO
 
 def _stichTiles(tile_array):
+
+    # First phase
     rows_arr = []
     for i in range(len(tile_array)):
         images = [Image.open(x) for x in tile_array[i]]
@@ -24,11 +27,10 @@ def _stichTiles(tile_array):
             new_im.save(f'tilerow{i}.png')
         rows_arr.append(f'tilerow{i}.png')
         print("--------")
-    return rows_arr
 
-def _stichRows(row_arr):
+    # Second phase
     y = 0
-    images = [Image.open(x) for x in row_arr]
+    images = [Image.open(x) for x in rows_arr]
     print(len(images))
     height = images[0].height * len(images)
     merged_im = Image.new('RGB', (images[0].width, height))
@@ -43,6 +45,9 @@ def _stichRows(row_arr):
         y += 1
     merged_im.save("full_pano.png",optimize=True, quality=95)
 
+    for f in rows_arr:
+        os.remove(f)
+
 def download_tile(panoID, x, y, i, zoom):
     url = "https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid={}&x={}&y={}&zoom={}&nbt=1&fover=2"
     url = url.format(panoID, x, y, zoom)
@@ -51,6 +56,6 @@ def download_tile(panoID, x, y, i, zoom):
     im.save(f"tile{i}.png")
 
 if __name__ == "__main__":
-    panorama.download_panorama("-xXXTLmT8HnuH2BpwkY3wQ")
+    panorama.download_panorama("R5CMjP6w-l8q6aqt4wSyTA")
     
     # https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid=-xXXTLmT8HnuH2BpwkY3wQ&x=12&y=6&zoom=4&nbt=1&fover=2

@@ -51,15 +51,12 @@ def download_panorama(panoID, zoom=4, keep_tiles=False):
         break
     
     # Merges the tiles
-    r_arr = tiles._stichTiles(tile_array)
-    tiles._stichRows(r_arr)
+    tiles._stichTiles(tile_array)
     
     if keep_tiles is False:
         for i in range(len(tile_array)):
             for f in tile_array[i]:
                 os.remove(f)
-        for f in r_arr:
-            os.remove(f)
     else:
         pass
 
