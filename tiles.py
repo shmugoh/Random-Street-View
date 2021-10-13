@@ -3,7 +3,7 @@ import os
 
 from PIL import Image
 from io import BytesIO
-import streetview.panorama as panorama
+import panorama
 
 def _stichTiles(tile_array):
 

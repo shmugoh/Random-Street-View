@@ -2,7 +2,7 @@ import requests
 import re
 import os
 import numpy as np
-import streetview.tiles as tiles
+import tiles
 
 def _panoid_url(lat, lon):
     """
