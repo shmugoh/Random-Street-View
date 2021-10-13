@@ -23,19 +23,22 @@ def _point_inside_polygon(x, y, poly):
         p1x, p1y = p2x, p2y
     return inside
 
-def generate_random_coordinates():
+def generate_random_coordinates(nation=""): # too lazy
     """
     Returns a random generated coordinate and its country.
     
     Picks a random continent and country, then generates
     a random coordinate inside the country.
     """
+
+    if len(nation) == 0:
+        nation=random.choice(random.choice(continents.CCC))
+
+    #  continent=random.choice([continents.ABB, continents.EEE, continents.FFF, continents.NNN, continents.SRR]
     ShapeFile = "borders/TM_WORLD_BORDERS-0.3.shp"
     sf = shapefile.Reader(ShapeFile, encoding="latin1")
     shapes = sf.shapes()
     while True:
-        continent = random.choice([continents.ABB, continents.EEE, continents.FFF, continents.NNN, continents.SRR])
-        nation = random.choice(continent)
         for i, record in enumerate(sf.records()):
             if record[2] == nation:
                 # print(record[2], record[4])

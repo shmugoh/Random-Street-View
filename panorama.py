@@ -33,6 +33,7 @@ def download_panorama(panoID, zoom=4, keep_tiles=False):
     current_tile = 0
     max_x, current_x = 13, 0
     max_y, current_y = 5, 0
+    print(max_y, max_x)
     tile_array=np.full([max_y, max_x], None)
     # print(tile_array)
 
@@ -57,12 +58,7 @@ def download_panorama(panoID, zoom=4, keep_tiles=False):
         for i in range(len(tile_array)):
             for f in tile_array[i]:
                 os.remove(f)
-    else:
-        pass
+    else: pass
 
 if __name__ == "__main__":
-    import tiles
-    lat = 6.237965431428744
-    lon = -75.6095178872445
-    pan = getpanoID(lat, lon)
-    print(pan['pano_id'])
+    print(getpanoID(10.951530820925198, -74.74894005071286))

@@ -7,5 +7,7 @@ FFF = ["ARE", "ISR", "LSO", "SWZ", "ZAF"]
 NNN = ["CAN", "MEX", "PRI", "USA"]
 SRR = ["ARG", "BRA", "CHL", "COL", "ECU", "GTM", "MEX", "PER", "URY"]
 
+CCC = [ABB, EEE, FFF, NNN, SRR]
+
 ## NATO Continents ISO 3166-1 alpha-3 Reserved Codes
 ## Countries with low presence/unofficial Street View presence are excluded.

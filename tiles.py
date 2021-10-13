@@ -1,16 +1,21 @@
 import requests
-import streetview.panorama as panorama
 import os
 
 from PIL import Image
 from io import BytesIO
+import streetview.panorama as panorama
 
 def _stichTiles(tile_array):
 
+    print("pain")
+    print(tile_array)
     # First phase
     rows_arr = []
     for i in range(len(tile_array)):
-        images = [Image.open(x) for x in tile_array[i]]
+        try:
+            images = [Image.open(x) for x in tile_array[i]]
+        except AttributeError: # this is gonna kill the script at some point
+            continue
         widths, heights = zip(*(i.size for i in images))
         total_width, max_height = sum(widths), max(heights)  
         new_im = Image.new('RGB', (total_width, max_height))
@@ -47,6 +52,8 @@ def _stichTiles(tile_array):
 
     for f in rows_arr:
         os.remove(f)
+    
+    # merged_im.sh
 
 def download_tile(panoID, x, y, i, zoom):
     url = "https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid={}&x={}&y={}&zoom={}&nbt=1&fover=2"
@@ -56,7 +63,6 @@ def download_tile(panoID, x, y, i, zoom):
     im.save(f"tile{i}.png")
 
 if __name__ == "__main__":
-    import panorama
     panorama.download_panorama("R5CMjP6w-l8q6aqt4wSyTA")
     
     # https://streetviewpixels-pa.googleapis.com/v1/tile?cb_client=maps_sv.tactile&panoid=-xXXTLmT8HnuH2BpwkY3wQ&x=12&y=6&zoom=4&nbt=1&fover=2
