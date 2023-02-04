@@ -1,8 +1,19 @@
+
+# Important Note
+
+Random Street View is now [sv-dlp](https://github.com/juanpisss/sv-dlp). Make sure to check it out!
+
+I will no longer be maintaining this *side* project unless if Twitter reverses their decision on the [latest API policy change](https://twitter.com/TwitterDev/status/1621026986784337922),
+as I do not have the enogh money to be paying for an API and I cannot migrate to other platforms. On a personal level,
+I don't plan on using IG/FB just for the sake of supervising the functionality of this project. 
+
+I will keep this repository up for archival purposes, so anyone is welcome to fork it/replicate it, although
+I would recommend implementing sv-dlp as its so much easier to rely on it rather than using a horribly-written, 
+poorly-performed codebase (please don't look at the `rewrite` branch.)
+
+Farewell Random-Street-View... for now.
+
 # Random Street View (Bot) 
-
-Refer to #3
-
-##
 
 Twitter Bot **(doesn't necessary have to be a Twitter Bot; refer to the next line)** that generates a random coordinate which gets reverse geocoded, translates it to a Street View image (by getting the panorama ID via the coordinates) then tweets it.
 
